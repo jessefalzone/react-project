@@ -24,8 +24,6 @@
     "eslint-plugin-react": "^3.16.1",
     "glob": "^7.0.0",
     "gulp": "^3.9.1",
-    "gulp-concat": "^2.6.0",
-    "gulp-concat-css": "^2.2.0",
     "gulp-minify": "0.0.5",
     "gulp-rimraf": "^0.2.0",
     "gulp-sass": "^2.2.0",

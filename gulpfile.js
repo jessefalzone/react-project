@@ -7,7 +7,6 @@ var source = require('vinyl-source-stream');
 var sourcemaps = require('gulp-sourcemaps');
 var gutil = require('gulp-util');
 var sass = require('gulp-sass');
-var concat = require('gulp-concat');
 var clean = require('gulp-rimraf');
 
 var config = {
@@ -48,7 +47,6 @@ gulp.task('sass', ['clean'], function() {
     return gulp.src(cssGlob)
         .pipe(sourcemaps.init())
         .pipe(sass({ outputStyle: 'compressed' }).on('error', sass.logError))
-        .pipe(concat('main.css'))
         .pipe(sourcemaps.write('./'))
         .pipe(gulp.dest('./dist/css'));
 });
