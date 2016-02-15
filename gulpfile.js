@@ -6,12 +6,20 @@ var babelify = require('babelify');
 var source = require('vinyl-source-stream');
 var sourcemaps = require('gulp-sourcemaps');
 var gutil = require('gulp-util');
+var sass = require('gulp-sass');
+var concat = require('gulp-concat');
+var clean = require('gulp-rimraf');
+
 var config = {
     prod: !!gutil.env.production
 };
 
+var jsGlob = './src/js/**/*.jsx';
+var cssGlob = './src/css/**/*.scss';
+
 gulp.task('browserify', function() {
-    var files = glob.sync('src/js/**/*.js');
+    console.log('Bundling packages...');
+    var files = glob.sync(jsGlob);
     return browserify({
             entries: files,
             insertGlobals: true
@@ -25,18 +33,36 @@ gulp.task('browserify', function() {
 });
 
 gulp.task('uglify', ['browserify'], function() {
-    gulp.src('dist/js/bundle.js')
+    console.log('Uglifying js....');
+    return gulp.src('dist/js/bundle.js')
         .pipe(sourcemaps.init())
-        .pipe(config.prod ? uglify({
+        .pipe(uglify({
             ignoreFiles: ['-min.js']
-        }) : gutil.noop())
+        }))
         .pipe(sourcemaps.write('./'))
         .pipe(gulp.dest('dist/js'));
 });
 
-gulp.task('watch', function() {
-    gulp.watch('src/js/**/*.js', ['build']);
+gulp.task('sass', ['clean'], function() {
+    console.log('Compiling Sass...');
+    return gulp.src(cssGlob)
+        .pipe(sourcemaps.init())
+        .pipe(sass({ outputStyle: 'compressed' }).on('error', sass.logError))
+        .pipe(concat('main.css'))
+        .pipe(sourcemaps.write('./'))
+        .pipe(gulp.dest('./dist/css'));
 });
 
-gulp.task('build', ['browserify', 'uglify']);
-gulp.task('default', ['build', 'watch']);
+gulp.task('clean', [], function() {
+    console.log("Cleaning dist/css folder...");
+    return gulp.src("./dist/css/*", { read: false }).pipe(clean());
+});
+
+gulp.task('watch', function() {
+    gulp.watch(jsGlob, ['build']);
+    gulp.watch(cssGlob, ['sass']);
+});
+
+gulp.task('build', ['browserify', 'sass']);
+gulp.task('prod', ['build', 'uglify']);
+gulp.task('default', ['build']);
